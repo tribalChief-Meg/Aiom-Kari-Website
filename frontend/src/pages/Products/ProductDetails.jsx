@@ -23,6 +23,10 @@ import ProductTabs from "./ProductTabs";
 import { addToCart } from "../../redux/features/cart/cartSlice";
 import { useTranslation } from "react-i18next";
 import Navigation from "../Auth/Navigation";
+// import { useTranslation } from "react-i18next";
+import i18n from "../../i18n";
+import { translateText } from "../../Utils/translate"; // ✅ your helper
+
 
 const ProductDetails = () => {
   const { t } = useTranslation();
@@ -36,6 +40,64 @@ const ProductDetails = () => {
   const [mainImage, setMainImage] = useState(null);
   const [isFixed, setIsFixed] = useState(true);
   const [style, setStyle] = useState(transitionStyles);
+  const [translatedProduct, setTranslatedProduct] = useState(null);
+
+  const [translatedLabels, setTranslatedLabels] = useState({
+  addToCart: "",
+  buyNow: "",
+  percentOff: "",
+  productDetails: "",
+  chatSupport: "",
+  rating: "",
+  ratings: "",
+  comment: "",
+  peopleCommented: "",
+});
+
+useEffect(() => {
+  const translateLabels = async () => {
+    if (i18n.language === "kh") {
+      const addToCart = await translateText("Add to Cart", "kh");
+      const buyNow = await translateText("Buy Now", "kh");
+      const percentOff = await translateText("% off", "kh");
+      const productDetails = await translateText("Product Details", "kh");
+      const chatSupport = await translateText("Chat Support", "kh");
+      const rating = await translateText("Rating", "kh");
+      const ratings = await translateText("Ratings", "kh");
+      const comment = await translateText("comment", "kh");
+      const peopleCommented = await translateText("people commented", "kh");
+
+      setTranslatedLabels({
+        addToCart,
+        buyNow,
+        percentOff,
+        productDetails,
+        chatSupport,
+        rating,
+        ratings,
+        comment,
+        peopleCommented,
+      });
+    } else {
+      setTranslatedLabels({
+        addToCart: "",
+        buyNow: "",
+        percentOff: "",
+        productDetails: "",
+        chatSupport: "",
+        rating: "",
+        ratings: "",
+        comment: "",
+        peopleCommented: "",
+      });
+    }
+  };
+
+  translateLabels();
+}, [i18n.language]);
+
+
+
 
   const {
     data: product,
@@ -112,6 +174,58 @@ const ProductDetails = () => {
     };
   }, []);
 
+
+  useEffect(() => {
+  const handleScroll = () => {
+    const reviewDiv = document.getElementById("reviewDiv");
+    const triggerPoint = reviewDiv.offsetTop - 1000;
+
+    if (window.scrollY >= triggerPoint) {
+      setStyle({ ...transitionStyles, opacity: 0, visibility: "hidden" });
+    } else {
+      setStyle({ ...transitionStyles, opacity: 1, visibility: "visible" });
+    }
+  };
+
+  window.addEventListener("scroll", handleScroll);
+  return () => {
+    window.removeEventListener("scroll", handleScroll);
+  };
+}, []);
+
+useEffect(() => {
+  const translateProduct = async () => {
+    if (!product) return;
+
+    if (i18n.language === "kh") {
+      const name = await translateText(product.name, "kh");
+      const description = await translateText(product.description, "kh");
+      const brand = await translateText(product.brand, "kh");
+
+
+      let detail = {};
+      if (product.detail && typeof product.detail === "object") {
+        const translatedDetail = await Promise.all(
+          Object.entries(product.detail).map(async ([key, val]) => {
+            const tKey = await translateText(key, "kh");
+            const tVal = await translateText(val, "kh");
+            return [tKey, tVal];
+          })
+        );
+        detail = Object.fromEntries(translatedDetail);
+      }
+
+      setTranslatedProduct({ ...product, name, description, brand, detail});
+    } else {
+      setTranslatedProduct(product);
+    }
+  };
+
+  translateProduct();
+}, [product, i18n.language]);
+
+
+
 const totalRatings = product?.reviews?.length || 0;
 const totalReviewsWithComments = product?.reviews?.filter((review) => review.comment)?.length || 0;
 
@@ -159,7 +273,9 @@ const totalReviewsWithComments = product?.reviews?.filter((review) => review.com
                     disabled={product.countInStock === 0}
                     className="w-full h-full bg-dark-red-normal text-white py-3 px-4 rounded-full font-bold hover:bg-dark-red-hover"
                   >
-                    {t("Buy Now")}
+                    {/* {t("Buy Now")} */}
+                    {i18n.language === "kh" ? translatedLabels.buyNow || t("Buy Now") : t("Buy Now")}
+
                   </button>
                 </div>
                 <div className="w-[30%] px-3">
@@ -168,16 +284,22 @@ const totalReviewsWithComments = product?.reviews?.filter((review) => review.com
                     disabled={product.countInStock === 0}
                     className="w-full h-full bg-dark-red-normal text-light-white py-3 px-4 rounded-full font-bold hover:bg-dark-red-hover"
                   >
-                    {t("Add to Cart")}
+                    {/* {t("Add to Cart")} */}
+                    {i18n.language === "kh" ? translatedLabels.addToCart || t("Add to Cart") : t("Add to Cart")}
+
                   </button>
                 </div>
               </div>
             </div>
             <div className="md:flex-1 px-4">
-              <h2 className="text-4xl font-semibold mr-2">{product.name}</h2>
+              {/* <h2 className="text-4xl font-semibold mr-2">{product.name}</h2> */}
+              <h2 className="text-4xl font-semibold mr-2">{translatedProduct?.name}</h2>
+
 
               <p className="my-4 text-dark-gray whitespace-pre-line">
-                {product.description}
+                {/* {product.description} */}
+                  {translatedProduct?.description}
+
               </p>
               <hr />
               <div className="flex mb-4">
@@ -197,7 +319,10 @@ const totalReviewsWithComments = product?.reviews?.filter((review) => review.com
                         marginLeft: "0.5rem",
                       }}
                     >
-                      {discountPercent} {t("% off")}
+                      {discountPercent} 
+                      {/* {t("% off")} */}
+                      {i18n.language === "kh" ? translatedLabels.percentOff || t("% off") : t("% off")}
+
                     </span>
                   </p>
                 </div>
@@ -207,7 +332,9 @@ const totalReviewsWithComments = product?.reviews?.filter((review) => review.com
                 <div className="one">
                   <h1 className="flex items-center mb-6 font-semibold">
                     <FaStore className="mr-2 text-gray-700" /> {t("Brand")}{" "}
-                    <h2 className="font-normal ml-2">{product.brand}</h2>
+                    {/* <h2 className="font-normal ml-2">{product.brand}</h2> */}
+                    <h2 className="font-normal ml-2">{translatedProduct?.brand}</h2>
+
                   </h1>
                 </div>
 
@@ -222,7 +349,7 @@ const totalReviewsWithComments = product?.reviews?.filter((review) => review.com
               <div className="mb-4">
                 <span className="font-bold text-dark-gray">{t("Ratings")}</span>
                 <div>
-                  <Ratings
+                  {/* <Ratings
                     value={product.rating}
                     text={t(
                       `${`${totalRatings} ${
@@ -233,7 +360,31 @@ const totalReviewsWithComments = product?.reviews?.filter((review) => review.com
                           : "comment"
                       }`}`
                     )}
-                  />
+                  /> */}
+                 <Ratings
+  value={product.rating}
+  text={
+    i18n.language === "kh"
+      ? `${totalRatings} ${
+          totalRatings > 1
+            ? translatedLabels.ratings
+            : translatedLabels.rating
+        } and ${totalReviewsWithComments} ${
+          totalReviewsWithComments > 1
+            ? translatedLabels.peopleCommented
+            : translatedLabels.comment
+        }`
+      : `${totalRatings} ${
+          totalRatings > 1 ? "Ratings" : "Rating"
+        } and ${totalReviewsWithComments} ${
+          totalReviewsWithComments > 1
+            ? "people commented"
+            : "comment"
+        }`
+  }
+/>
+  
+
                 </div>
               </div>
 
@@ -241,7 +392,9 @@ const totalReviewsWithComments = product?.reviews?.filter((review) => review.com
                 className="text-dark-black py-2 px-4 rounded-full text-md font-semibold border border-dark-red-normal hover:bg-dark-red-hover hover:text-white"
                 onClick={handleChatSupport}
               >
-                {t("Chat Support")}
+                {/* {t("Chat Support")} */}
+                {i18n.language === "kh" ? translatedLabels.chatSupport || t("Chat Support") : t("Chat Support")}
+
               </button>
 
               <br />
@@ -250,9 +403,11 @@ const totalReviewsWithComments = product?.reviews?.filter((review) => review.com
               <br />
               <div className="mb-4">
                 <span className="font-bold text-dark-gray">
-                  {t("Product Details")}
+                  {/* {t("Product Details")} */}
+                  {i18n.language === "kh" ? translatedLabels.productDetails || t("Product Details") : t("Product Details")}
+
                 </span>
-                {product && product.detail && (
+                {/* {product && product.detail && (
                   <table className="table-auto border-hidden mt-2">
                     <tbody>
                       {Object.entries(product.detail).map(([key, value]) => (
@@ -267,7 +422,22 @@ const totalReviewsWithComments = product?.reviews?.filter((review) => review.com
                       ))}
                     </tbody>
                   </table>
-                )}
+                )} */}
+                {translatedProduct && translatedProduct.detail && (
+  <table className="table-auto border-hidden mt-2">
+    <tbody>
+      {Object.entries(translatedProduct.detail).map(([key, value]) => (
+        <tr key={key}>
+          <td className="border px-4 py-2 border-hidden font-semibold">{key}</td>
+          <td className="border px-4 py-2 border-hidden whitespace-pre-line">
+            {value}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+)}
+
               </div>
             </div>
           </div>

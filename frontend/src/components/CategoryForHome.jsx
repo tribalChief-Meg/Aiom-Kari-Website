@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFetchCategoriesQuery } from "../redux/api/categoryApiSlice";
 import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
+import { translateText } from "../Utils/translate";
+
+
 
 const Category = () => {
   const { t } = useTranslation();
@@ -10,6 +14,41 @@ const Category = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [hoveredCategory, setHoveredCategory] = useState(null);
   const [timeoutId, setTimeoutId] = useState(null);
+
+  const [translatedCategories, setTranslatedCategories] = useState({});
+  const [translatedSubcategories, setTranslatedSubcategories] = useState({});
+
+
+
+  useEffect(() => {
+  const translateAll = async () => {
+    if (i18n.language === "kh" && categories) {
+      const catTranslations = {};
+      const subcatTranslations = {};
+
+      for (const category of categories) {
+        const tCat = await translateText(category.name, "kh");
+        catTranslations[category._id] = tCat;
+
+        if (category.subcategories) {
+          for (const sub of category.subcategories) {
+            const tSub = await translateText(sub.name, "kh");
+            subcatTranslations[sub._id] = tSub;
+          }
+        }
+      }
+
+      setTranslatedCategories(catTranslations);
+      setTranslatedSubcategories(subcatTranslations);
+    } else {
+      setTranslatedCategories({});
+      setTranslatedSubcategories({});
+    }
+  };
+
+  translateAll();
+}, [categories, i18n.language]);
+
 
   const handleCategoryClick = (category) => {
     navigate(`/shop?category=${category.name}`);
@@ -48,7 +87,10 @@ const Category = () => {
               className=" text-dark-red-normal py-1 px-4 rounded-lg  ml-5 hover:bg-dark-red-normal hover:text-white  ease-in-out duration-100 font-semibold text-xl mb-[0.5rem]"
               onClick={() => handleCategoryClick(category)}
             >
-              {t(`${category.name}`)}
+              {/* {t(`${category.name}`)} */}
+                                    {i18n.language === "kh"
+  ? translatedCategories[category._id] || category.name
+  : t(`${category.name}`)}
             </button>
             {hoveredCategory === category._id && category.subcategories && (
               <div className="absolute top-full left-[50%] transform -translate-x-1/2 mt-2 w-48 bg-white shadow-lg rounded-lg z-10">
@@ -60,7 +102,11 @@ const Category = () => {
                       handleSubcategoryClick(category, subcategory)
                     }
                   >
-                    {t(`${subcategory.name}`)}
+                    {/* {t(`${subcategory.name}`)} */}
+                    {i18n.language === "kh"
+                      ? translatedSubcategories[subcategory._id] || subcategory.name
+                      : t(`${subcategory.name}`)}
+
                   </button>
                 ))}
               </div>
@@ -113,7 +159,11 @@ const Category = () => {
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-light-lightRed hover:text-gray-900 font-semibold"
                       role="menuitem"
                     >
-                      {t(`${category.name}`)}
+                      {/* {t(`${category.name}`)} */}
+                      {i18n.language === "kh"
+  ? translatedCategories[category._id] || category.name
+  : t(`${category.name}`)}
+
                     </a>
                   ))}
                 </div>

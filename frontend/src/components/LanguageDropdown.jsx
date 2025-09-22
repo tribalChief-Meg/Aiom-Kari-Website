@@ -3,7 +3,9 @@ import { useState } from "react";
 
 const LanguageDropdown = () => {
   const { i18n } = useTranslation();
-  const currentLang = localStorage.getItem("language") || "en";
+  // const currentLang = localStorage.getItem("language") || "en";
+  const currentLang = i18n.language || "en";
+
   const [isHovered, setIsHovered] = useState(false);
 
   const changeLanguage = (newLang) => {

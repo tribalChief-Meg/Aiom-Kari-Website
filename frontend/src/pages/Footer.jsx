@@ -1,8 +1,126 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
+import React, { useState } from "react";
 
 const Footer = () => {
   const { t } = useTranslation();
+
+  // Function to handle language change using Google Translate
+  const handleLanguageChange = (language) => {
+    const translateElement = document.querySelector('.goog-te-combo');
+    if (translateElement) {
+      translateElement.value = language; // Set the selected language
+      translateElement.dispatchEvent(new Event('change')); // Trigger the change event
+    }
+  };
+
+  // Dynamically load Google Translate script
+  const loadGoogleTranslateScript = () => {
+    const script = document.createElement("script");
+    script.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+    script.type = "text/javascript";
+    document.body.appendChild(script);
+  };
+
+  // Initialize Google Translate with inline layout and disabled banner
+  window.googleTranslateElementInit = () => {
+    new google.translate.TranslateElement(
+      {
+        pageLanguage: 'en', // Default language
+        includedLanguages: 'en,hi,fr,de,es,it,kh', // Add languages you want to support
+        // layout: google.translate.TranslateElement.InlineLayout.SIMPLE, // Inline layout for no toolbar
+        gaTrack: true, // Optional: Track Google Analytics events
+        autoDisplay: false, // Disable auto display of translation
+        toolbar: false, // Disable the floating toolbar
+      },
+      'google_translate_element'
+    );
+  };
+
+  // Use useEffect to load the Google Translate script when the component is mounted
+  useEffect(() => {
+    loadGoogleTranslateScript();
+
+    // Add CSS to hide the Google Translate toolbar if it exists
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .goog-te-banner-frame { display: none !important; } /* Hide the translate toolbar */
+      .goog-te-menu-value:hover { text-decoration: none !important; } /* Prevent underline on hover */
+      .goog-te-combo { margin-top: 5px; } /* Adjust dropdown position if necessary */
+    `;
+    document.head.appendChild(style);
+  }, []);
+
+  const [isTransformed, setIsTransformed] = useState(false);
+  const [originalContent, setOriginalContent] = useState("");
+
+  const handleTransform = async () => {
+    console.log(`[DEBUG] Button clicked at ${new Date().toISOString()}`);
+
+    if (!isTransformed) {
+        console.log(`[DEBUG] Starting transformation process at ${new Date().toISOString()}`);
+
+        // Extract original content and store it in the state
+        const pageContent = document.body.cloneNode(true); // Clone the entire body
+        setOriginalContent(pageContent);
+
+        // Extract all text from the page
+        const pageText = document.body.innerText;
+        console.log(`[DEBUG] Extracted Text:`, pageText);
+
+        try {
+            console.log(`[DEBUG] Sending POST request to backend at ${new Date().toISOString()}`);
+            const response = await fetch("http://localhost:5000/api/transform-text", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ text: pageText }),
+            });
+
+            if (!response.ok) {
+                console.error(`[ERROR] Response error: ${response.statusText}`);
+                return;
+            }
+
+            const data = await response.json();
+            console.log(`[DEBUG] Response Data:`, data);
+
+            // Replace text in each node
+            replaceTextInNodes(document.body, data.transformedText);
+        } catch (error) {
+            console.error(`[ERROR] Fetch error at ${new Date().toISOString()}:`, error);
+        }
+    } else {
+        console.log(`[DEBUG] Restoring original content at ${new Date().toISOString()}`);
+        // Restore the original DOM structure
+        document.body.replaceWith(originalContent);
+    }
+
+    setIsTransformed(!isTransformed);
+    console.log(`[DEBUG] Transformation state toggled at ${new Date().toISOString()}`);
+};
+
+/**
+ * Recursively replace text in all child nodes.
+ * @param {Node} element - The root DOM node to process.
+ * @param {string} transformedText - The transformed text.
+ */
+const replaceTextInNodes = (element, transformedText) => {
+    if (element.nodeType === Node.TEXT_NODE) {
+        // Replace text content for text nodes
+        const words = element.textContent.split(/\s+/).filter(Boolean); // Split by whitespace
+        const transformedWords = transformedText.split(/\s+/);
+        element.textContent = words
+            .map((word, index) => transformedWords[index] || word)
+            .join(" ");
+    } else {
+        // Process child nodes recursively
+        element.childNodes.forEach((child) => replaceTextInNodes(child, transformedText));
+    }
+};
+
   return (
     <footer className="bg-dark-gray z-10 w-full">
       <div className="mx-auto w-full max-w-screen-xl">
@@ -201,13 +319,28 @@ const Footer = () => {
               </a>
             </div>
           </div>
+          <div>
+          <button onClick={handleTransform} className="btn-primary" style={{
+        backgroundColor: "#007bff", // Blue background
+        color: "white", // White text
+        border: "none", // Remove border
+        padding: "10px 20px", // Add padding
+        fontSize: "14px", // Adjust font size
+        fontWeight: "bold", // Make text bold
+        borderRadius: "5px", // Rounded corners
+        cursor: "pointer", // Pointer cursor on hover
+        transition: "background-color 0.3s ease", // Smooth transition
+    }}>
+                    {isTransformed ? "Show Original" : "Transform Page"}
+          </button>
+          </div>
         </div>
       </div>
       <div className="px-4 py-3 border-t bg-dark-gray md:flex md:items-center md:justify-between">
         <span className="text-sm text-light-white sm:text-center ml-5">
           © 2023{" "}
           <a href="#" className="hover:underline">
-            Meghali
+            Aiom-Kari
           </a>
            All Rights Reserved.
         </span>

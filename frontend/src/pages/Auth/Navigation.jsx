@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   AiOutlineShopping,
   AiOutlineLogin,
@@ -17,11 +17,104 @@ import { useLogoutMutation } from "../../redux/api/usersApiSlice";
 import { useGetProductsQuery } from "../../redux/api/productApiSlice";
 import { logout } from "../../redux/features/auth/authSlice";
 import { useTranslation } from "react-i18next";
+
+import i18n from "../../i18n";
+import { translateText } from "../../Utils/translate";
+
 import LanguageDropdown from "../../components/LanguageDropdown";
 import FavoritesCount from "../../pages/Products/FavoritesCount";
 import logo from "../../Utils/images/logo.png";
 const Navigation = () => {
   const { t } = useTranslation();
+
+  const [translatedLabels, setTranslatedLabels] = useState({
+  shop: "",
+  cart: "",
+  favourites: "",
+  login: "",
+  dashboard: "",
+  categories: "",
+  applications: "",
+  users: "",
+  products: "",
+  orders: "",
+  chatDashboard: "",  
+  profile: "",
+  becomeSeller: "",
+  adminRegistration: "",
+  adminList: "",
+  logout: "",
+});
+
+
+  useEffect(() => {
+  const fetchTranslations = async () => {
+    if (i18n.language === "kh") {
+      const search = await translateText("Search", "kh");
+      const shop = await translateText("Shop", "kh");
+      const cart = await translateText("Cart", "kh");
+      const favourites = await translateText("Favourites", "kh");
+      const login = await translateText("Login", "kh");
+      const dashboard = await translateText("Dashboard", "kh");
+      const categories = await translateText("Categories", "kh");
+      const applications = await translateText("Applications", "kh");
+      const users = await translateText("Users", "kh");
+      const products = await translateText("Products", "kh");
+      const orders = await translateText("Orders", "kh");
+      const chatDashboard = await translateText("Chat Dashboard", "kh");
+      const profile = await translateText("Profile", "kh");
+      const becomeSeller = await translateText("Become a Seller", "kh");
+      const adminRegistration = await translateText("Admin Registration", "kh");
+      const adminList = await translateText("Admin List", "kh");
+      const logout = await translateText("Logout", "kh");
+
+      setTranslatedLabels({
+        search,
+        shop,
+        cart,
+        favourites,
+        login,
+        dashboard,
+        categories,
+        applications,
+        users,
+        products,
+        orders,
+        chatDashboard,
+        profile,
+        becomeSeller,
+        adminRegistration,
+        adminList,
+        logout,
+      });
+    } else {
+      setTranslatedLabels({
+        search:"",
+        shop: "",
+        cart: "",
+        favourites: "",
+        login: "",
+        dashboard: "",
+        categories: "",
+        applications: "",
+        users: "",
+        products: "",
+        orders: "",
+        chatDashboard: "",
+        profile: "",
+        becomeSeller: "",
+        adminRegistration: "",
+        adminList: "",
+        logout: "",
+      });
+    }
+  };
+
+  fetchTranslations();
+}, [i18n.language]);
+
+
+
   const [clickCount, setClickCount] = useState(0);
   const { userInfo } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.cart);
@@ -103,14 +196,15 @@ const Navigation = () => {
             onClick={handleLogoClick}
           />
           <span className="self-center text-2xl font-semibold whitespace-nowrap text-light-white">
-            Meghali
+            Aiom-Kari
           </span>
         </a>
       </div>
       <div className="flex flex-grow justify-center relative">
         <input
           type="text"
-          placeholder={t("Search")}
+          placeholder={i18n.language === "kh" ? translatedLabels.search || t("Search") : t("Search")} // {t("Search")}
+
           className="py-2 flex-grow px-4 w-96 h-9 rounded-3xl bg-light-white text-black focus:outline-none xs:w-24 sm:w-28 md:w-40"
           value={searchTerm}
           onChange={handleSearchChange}
@@ -145,7 +239,11 @@ const Navigation = () => {
               className="nav-link hover:text-dark-yellow hidden lg:inline-flex"
             >
               <AiOutlineShopping size={26} />
-              <span className="nav-item-name">{t("Shop")}</span>
+              {/* <span className="nav-item-name">{t("Shop")}</span> */}
+              <span className="nav-item-name">
+                {i18n.language === "kh" ? translatedLabels.shop || t("Shop") : t("Shop")}
+              </span>
+
             </Link>
           </div>
           <div className="navigation-container">
@@ -154,7 +252,11 @@ const Navigation = () => {
               className="nav-link relative hover:text-dark-yellow hidden lg:inline-flex"
             >
               <AiOutlineShoppingCart size={26} />
-              <span className="nav-item-name">{t("Cart")}</span>
+              {/* <span className="nav-item-name">{t("Cart")}</span> */}
+              <span className="nav-item-name">
+                {i18n.language === "kh" ? translatedLabels.cart || t("Cart") : t("Cart")}
+              </span>
+
               <div className="absolute top-0">
                 {cartItems.length > 0 && (
                   <span className="px-1 py-0 text-sm text-white bg-dark-green-normal rounded-full">
@@ -170,7 +272,11 @@ const Navigation = () => {
               className="nav-link relative hover:text-dark-yellow hidden lg:inline-flex"
             >
               <FaHeart size={26} />
-              <span className="nav-item-name pl-1">{t("Favourites")}</span>
+              {/* <span className="nav-item-name pl-1">{t("Favourites")}</span> */}
+              <span className="nav-item-name pl-1">
+                {i18n.language === "kh" ? translatedLabels.favourites || t("Favourites") : t("Favourites")}               
+              </span>
+
               <FavoritesCount />
             </Link>
           </div>
@@ -219,7 +325,9 @@ const Navigation = () => {
                         to="/admin/dashboard"
                         className="rounded block px-4 py-2 hover:bg-gray-200"
                       >
-                        {t("Dashboard")}
+                        {/* {t("Dashboard")} */}
+                        {i18n.language === "kh" ? translatedLabels.dashboard || t("Dashboard") : t("Dashboard")}
+
                       </Link>
                     </li>
                     {/* <li>
@@ -235,7 +343,9 @@ const Navigation = () => {
                         to="/admin/categorylist"
                         className="rounded block px-4 py-2 hover:bg-gray-200"
                       >
-                        {t("Categories")}
+                        {/* {t("Categories")} */}
+                          {i18n.language === "kh" ? translatedLabels.categories || t("Categories") : t("Categories")}
+
                       </Link>
                     </li>
                     {/* <li>
@@ -251,7 +361,9 @@ const Navigation = () => {
                         to="/admin/Aplicationlist"
                         className="rounded block px-4 py-2 hover:bg-gray-200"
                       >
-                        {t("Applications")}
+                        {/* {t("Applications")} */}
+                        {i18n.language === "kh" ? translatedLabels.applications || t("Applications") : t("Applications")}
+
                       </Link>
                     </li>
                     <li>
@@ -259,7 +371,8 @@ const Navigation = () => {
                         to="/admin/userlist"
                         className="rounded block px-4 py-2 hover:bg-gray-200"
                       >
-                        {t("Users")}
+                        {/* {t("Users")} */}
+                        {i18n.language === "kh" ? translatedLabels.users || t("Users") : t("Users")}
                       </Link>
                     </li>
                   </>
@@ -271,7 +384,8 @@ const Navigation = () => {
                         to="/seller/productlist"
                         className="rounded block px-4 py-2 hover:bg-gray-200"
                       >
-                        {t("Products")}
+                        {/* {t("Products")} */}
+                        {i18n.language === "kh" ? translatedLabels.products || t("Products") : t("Products")}
                       </Link>
                     </li>
 
@@ -280,7 +394,9 @@ const Navigation = () => {
                         to="/seller/orderlist"
                         className="rounded block px-4 py-2 hover:bg-gray-200"
                       >
-                        {t("Orders")}
+                        {/* {t("Orders")} */}
+                        {i18n.language === "kh" ? translatedLabels.orders || t("Orders") : t("Orders")}
+
                       </Link>
                     </li>
                     {/* <li>
@@ -298,7 +414,9 @@ const Navigation = () => {
                     to="/profile"
                     className="rounded block px-4 py-2 hover:bg-gray-200"
                   >
-                    {t("Profile")}
+                    {/* {t("Profile")} */}
+                    {i18n.language === "kh" ? translatedLabels.profile || t("Profile") : t("Profile")}
+
                   </Link>
                 </li>
 
@@ -309,7 +427,9 @@ const Navigation = () => {
                         to="/chat"
                         className="rounded block px-4 py-2 hover:bg-gray-200"
                       >
-                        {t("Chat Dashboard")}
+                        {/* {t("Chat Dashboard")} */}
+                        {i18n.language === "kh" ? translatedLabels.chatDashboard || t("Chat Dashboard") : t("Chat Dashboard")}
+
                       </Link>
                     </li>
                   </ul>
@@ -321,7 +441,9 @@ const Navigation = () => {
                       to="/sellerRegistration"
                       className="rounded block px-4 py-2 hover:bg-gray-200"
                     >
-                      {t("Become a Seller")}
+                      {/* {t("Become a Seller")} */}
+                        {i18n.language === "kh" ? translatedLabels.becomeSeller || t("Become a Seller") : t("Become a Seller")}
+
                     </Link>
                   </li>
                 )}
@@ -343,7 +465,9 @@ const Navigation = () => {
                         to="/adminRegistration"
                         className="rounded block px-4 py-2 hover:bg-gray-200"
                       >
-                        {t("Admin Registration")}
+                        {/* {t("Admin Registration")} */}
+                          {i18n.language === "kh" ? translatedLabels.adminRegistration || t("Admin Registration") : t("Admin Registration")}
+
                       </Link>
                     </li>
 
@@ -352,7 +476,9 @@ const Navigation = () => {
                         to="/adminList"
                         className="rounded block px-4 py-2 hover:bg-gray-200"
                       >
-                        {t("Admin List")}
+                        {/* {t("Admin List")} */}
+                        {i18n.language === "kh" ? translatedLabels.adminList || t("Admin List") : t("Admin List")}
+
                       </Link>
                     </li>
                   </ul>
@@ -378,7 +504,9 @@ const Navigation = () => {
                     onClick={logoutHandler}
                     className="rounded block px-4 py-2 hover:bg-gray-200"
                   >
-                    {t("Logout")}
+                    {/* {t("Logout")} */}
+                    {i18n.language === "kh" ? translatedLabels.logout || t("Logout") : t("Logout")}
+
                   </Link>
                 </li>
               </ul>
@@ -389,7 +517,11 @@ const Navigation = () => {
             <div>
               <Link to="/login" className="nav-link">
                 <AiOutlineLogin size={26} />
-                <span className="nav-item-name">{t("Login")}</span>
+                {/* <span className="nav-item-name">{t("Login")}</span> */}
+                <span className="nav-item-name">
+                  {i18n.language === "kh" ? translatedLabels.login || "Login" : t("Login")}
+                </span>
+
               </Link>
             </div>
           </div>

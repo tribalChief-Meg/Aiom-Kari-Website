@@ -9,6 +9,10 @@ import loginImage from "../../components/images/login.jpg";
 import { useTranslation } from "react-i18next";
 import "./login.css"; // Import the CSS file
 
+import i18n from "../../i18n";
+import { translateText } from "../../Utils/translate";
+
+
 
 const Login = () => {
   const { t } = useTranslation();
@@ -45,11 +49,65 @@ const Login = () => {
     }
   };
 
+  const [translatedLabels, setTranslatedLabels] = useState({
+  login: "",
+  email: "",
+  emailPlaceholder: "",
+  password: "",
+  passwordPlaceholder: "",
+  loggingIn: "",
+  newUser: "",
+  register: "",
+});
+
+useEffect(() => {
+  const translateLabels = async () => {
+    if (i18n.language === "kh") {
+      const login = await translateText("Login", "kh");
+      const email = await translateText("Email Address", "kh");
+      const emailPlaceholder = await translateText("Enter your email address", "kh");
+      const password = await translateText("Password", "kh");
+      const passwordPlaceholder = await translateText("Enter your password", "kh");
+      const loggingIn = await translateText("Logging in...", "kh");
+      const newUser = await translateText("New User", "kh");
+      const register = await translateText("Register", "kh");
+
+      setTranslatedLabels({
+        login,
+        email,
+        emailPlaceholder,
+        password,
+        passwordPlaceholder,
+        loggingIn,
+        newUser,
+        register,
+      });
+    } else {
+      setTranslatedLabels({
+        login: "",
+        email: "",
+        emailPlaceholder: "",
+        password: "",
+        passwordPlaceholder: "",
+        loggingIn: "",
+        newUser: "",
+        register: "",
+      });
+    }
+  };
+
+  translateLabels();
+}, [i18n.language]);
+
+
   return (
     <div className="login-section">
       <section className="login-container">
         <div className="login-form">
-          <h1 className="text-2xl font-semibold mb-4">{t("Login")}</h1>
+          <h1 className="text-2xl font-semibold mb-4">
+            {/* {t("Login")} */}
+              {i18n.language === "kh" ? translatedLabels.login || t("Login") : t("Login")}
+            </h1>
 
           <form
             onSubmit={submitHandler}
@@ -61,13 +119,16 @@ const Login = () => {
                 htmlFor="email"
                 className="block text-sm font-medium text-black focus:outline-none"
               >
-                {t("Email Address")}
+                {/* {t("Email Address")} */}
+                {i18n.language === "kh" ? translatedLabels.email || t("Email Address") : t("Email Address")}
+
               </label>
               <input
                 type="email"
                 id="email"
                 className="mt-1 p-2 border rounded w-full focus:outline-none"
-                placeholder={t("Enter your email address")}
+                // placeholder={t("Enter your email address")}
+                placeholder={i18n.language === "kh" ? translatedLabels.emailPlaceholder || t("Enter your email address") : t("Enter your email address")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -77,13 +138,16 @@ const Login = () => {
                 htmlFor="password"
                 className="block text-sm font-medium text-black focus:outline-none"
               >
-                {t("Password")}
+                {/* {t("Password")} */}
+                {i18n.language === "kh" ? translatedLabels.password || t("Password") : t("Password")}
+
               </label>
               <input
                 type="password"
                 id="password"
                 className="mt-1 p-2 border rounded w-full focus:outline-none"
-                placeholder={t("Enter your password")}
+                // placeholder={t("Enter your password")}
+                placeholder={i18n.language === "kh" ? translatedLabels.passwordPlaceholder || t("Enter your password") : t("Enter your password")}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -94,7 +158,13 @@ const Login = () => {
               type="submit"
               className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer my-[1rem]"
             >
-              {t(`${isLoading ? "Logging in..." : "Login"}`)}
+              {/* {t(`${isLoading ? "Logging in..." : "Login"}`)} */}
+              {i18n.language === "kh"
+    ? isLoading
+      ? translatedLabels.loggingIn || t("Logging in...")
+      : translatedLabels.login || t("Login")
+    : t(isLoading ? "Logging in..." : "Login")}
+
             </button>
 
             {isLoading && <Loader />}
@@ -102,13 +172,21 @@ const Login = () => {
 
           <div className="mt-4">
             <p className="text-black">
-              {t("New User")}?{" "}
+              {/* {t("New User")}?{" "}
               <Link
                 to={redirect ? `/register?redirect=${redirect}` : `/register`}
                 className="text-green-500 hover:underline"
               >
                 {t("Register")}
+              </Link> */}
+              {i18n.language === "kh" ? translatedLabels.newUser || t("New User") : t("New User")}?
+             <Link
+                 to={redirect ? `/register?redirect=${redirect}` : `/register`}
+                  className="text-green-500 hover:underline"
+              >
+                {i18n.language === "kh" ? translatedLabels.register || t("Register") : t("Register")}
               </Link>
+
             </p>
           </div>
         </div>
