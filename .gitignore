@@ -1,5 +1,54 @@
-node_modules/*
+# node_modules/*
 
+# .env
+# .env.*
+# node_modules
+
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build outputs
+dist/
+build/
+
+# Environment files
 .env
 .env.*
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Logs
+*.log
+logs/
+
+# IDE/editor files
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+
+# Git LFS handled files shouldn't be ignored, but other large local files can be
+*.sqlite
+*.db
+
+# Backup folders
+frontend/src/locales/kh_backup/
 node_modules
