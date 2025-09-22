@@ -1,3 +1,11 @@
+# Aiom-Kari Website
+
+An e-commerce platform built with the **MERN stack** (MongoDB, Express, React, Node.js) and styled with **TailwindCSS**.  
+The project integrates an **AI-powered translation system** built with **Python (FastAPI) + Hugging Face MarianMT**, fine-tuned for **English ↔ Khasi**.  
+The trained model (`model.safetensors`) is stored in `backend/python/model/` and tracked via **Git LFS** due to its large size.
+
+---    
+
 # Setup Steps:
 
 1.  npm create vite@latest frontend -- --template react -y
